@@ -1,0 +1,24 @@
+version: '3.1'
+services:
+    # Nuxt Test Application
+    nuxt:
+        container_name: nuxt
+        build:
+            context: ../..
+            dockerfile: ./deploy/local/dockerfile
+        environment:
+            DB_HOST: ${DB_HOST:-mysql}
+            VIRTUAL_HOST: ${VIRTUAL_HOST:-nuxt.test}
+            VIRTUAL_PORT: ${VIRTUAL_PORT:-3107}
+        ports:
+            - 24678:24678
+        restart: on-failure
+        volumes:
+            - ${DATA_DIR:-~/Sites/_packages/nuxt}:/app:delegated
+        working_dir: /app
+
+# Networks
+networks:
+    default:
+        external:
+            name: nginx-proxy
