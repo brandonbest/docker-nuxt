@@ -1,5 +1,4 @@
 .output
 .nuxt
-deploy
 node_modules
 .env

@@ -1,61 +1,60 @@
-# Nuxt 3 Docker Container
+# Nuxt 3 Minimal Starter
 
-This is a base container to get Nuxt running inside a Docker container.
+Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-To use this in your project, import the Docker container.
+# Local Setup
 
+### Create Local Files
+
+Assuming the local directory is ~/Sites/nuxt.test:
+
+```
+mkdir ~/Sites/nuxt.test;
+cat ~/Sites/nuxt.test/dockerfile;
+cat ~/Sites/nuxt.test/dockerfile.yml;
+```
+
+### Fill in the Files
+
+Create a new `dockerfile` with the following:
+```
 FROM brandondbest/nuxt:3
 
-| Docker Tag             | NPM Version | Nuxt Version |
-|------------------------|-------------|--------------|
-| brandondbest/nuxt:3    | latest      | latest       |
-| brandondbest/nuxt:3-18 | 18          | 3            |
-| brandondbest/nuxt:3-17 | 17          | 3            |
+RUN nuxt-init
 
----
-
-## Build The Image
-```
-docker build -t brandondbest/nuxt .
+RUN npm install
 ```
 
-Tag the image to the top level:
-```
-docker build -t brandondbest/nuxt:3 -t brandondbest/nuxt:3-18 .
-```
-
-### Push the Image
+Also create `dockerfile.yml`
 
 ```
-docker push brandondbest/nuxt
+version: '3.1'
+services:
+    # Nuxt Application
+    nuxt:
+        container_name: nuxt
+        build:
+            context: ..
+            dockerfile: ./dockerfile
+        environment:
+            VIRTUAL_HOST: ${VIRTUAL_HOST:-nuxt.test}
+            VIRTUAL_PORT: ${VIRTUAL_PORT:-3000}
+        restart: on-failure
+        volumes:
+            - ${DATA_DIR:-~/Sites/nuxt.test}:/nuxt/
+            - /nuxt/node_modules
 ```
 
-Push a tagged Image:
-```
-docker push brandondbest/nuxt:3;
-docker push brandondbest/nuxt:3-18;
-```
 
-For information on the requirements for each Laravel version:
-https://laravel.com/docs/10.x/releases
+# Docker Container Tag
 
-### Create the Image for Additional Processors
+The dockerfile is located in the root directory. To create a new tagged release:
 
 ```
-docker buildx create --name nuxt3
-docker buildx use nuxt3
 docker buildx build --platform linux/amd64,linux/arm64 -t brandondbest/nuxt:3 -t brandondbest/nuxt:3-17 --push .
 ```
 
-
----
-
-## Original Setup
-
-Before running Docker compose, setup nuxt.
-
-```
-mkdir ~/Sites/nuxt;
-cd ~/Sites/nuxt;
-npx nuxi init .;
-```
+Tags:
+- nuxt:3
+- nuxt:3-<npm version>
+- nuxt:3-17
